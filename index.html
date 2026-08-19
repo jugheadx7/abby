@@ -255,6 +255,8 @@ textarea{resize:vertical;min-height:80px;}
     <button class="nav-btn" onclick="showPage('learn')" id="nav-learn">🎓 Learn</button>
     <button class="nav-btn" onclick="showPage('analytics')" id="nav-analytics">🧪 Analytics</button>
     <button class="nav-btn" onclick="showPage('report')" id="nav-report">📋 Report Card</button>
+    <button class="nav-btn" onclick="showPage('edges')" id="nav-edges">⚡ My Edges</button>
+    <button class="nav-btn" onclick="showPage('research')" id="nav-research">🔬 Pre-Game</button>
     <button class="nav-btn" onclick="showPage('settings')" id="nav-settings">⚙️ Settings</button>
   </nav>
   <div class="header-right">
@@ -821,9 +823,112 @@ textarea{resize:vertical;min-height:80px;}
 <!-- TOAST -->
 <div class="toast" id="toast"><span class="t-icon" id="toast-icon">✓</span><span id="toast-msg">Saved!</span></div>
 
-<div id="target-plan-table" style="display:none"></div><div id="tgt-vs-plan" style="display:none"></div><div id="tgt-vs-plan-sub" style="display:none"></div><div id="tgt-on-track" style="display:none"></div></div><!-- /app -->
+<div id="target-plan-table" style="display:none"></div><div id="tgt-vs-plan" style="display:none"></div><div id="tgt-vs-plan-sub" style="display:none"></div><div id="tgt-on-track" style="display:none"></div>
+<!-- ═══ MY EDGES ═══ -->
+<div class="page" id="page-edges">
+  <div class="section-head fade-in">
+    <div><div class="section-title">⚡ My Edges</div><div class="section-sub">Where you actually have an advantage</div></div>
+  </div>
+  <div id="edges-content" style="display:grid;gap:16px"></div>
+</div>
+
+<!-- ═══ PRE-GAME RESEARCH ═══ -->
+<div class="page" id="page-research">
+  <div class="section-head fade-in">
+    <div><div class="section-title">🔬 Pre-Game Research</div><div class="section-sub">Build your case before placing a bet</div></div>
+    <button class="btn-primary" onclick="newResearch()">+ New Research</button>
+  </div>
+  <div id="research-list" style="display:grid;gap:12px;margin-top:8px"></div>
+  <div class="modal-overlay" id="research-modal" onclick="if(event.target===this)closeResearchModal()">
+    <div class="modal" style="max-width:680px">
+      <div class="modal-header"><div class="modal-title" id="research-modal-title">New Pre-Game Research</div><button class="modal-close" onclick="closeResearchModal()">✕</button></div>
+      <div style="display:grid;gap:16px">
+        <div class="card" style="padding:16px">
+          <div class="settings-section-title" style="margin-bottom:12px">🏟️ Matchup</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><label>Team / Player A</label><input class="form-control" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-teamA" placeholder="e.g. Lakers"></div>
+            <div><label>Team / Player B</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-teamB" placeholder="e.g. Celtics"></div>
+            <div><label>Sport</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-sport" placeholder="e.g. NBA"></div>
+            <div><label>Bet Type</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-bettype" placeholder="e.g. Spread"></div>
+            <div><label>Your Pick</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-pick" placeholder="e.g. Lakers -3.5"></div>
+            <div><label>Odds</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-odds" type="number" step="0.01" placeholder="e.g. 1.90"></div>
+          </div>
+          <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-weight:600">⚡ EV CALCULATOR</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end">
+              <div><label>Your True Probability %</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-prob" type="number" min="1" max="99" placeholder="e.g. 58" oninput="calcResearchEV()"></div>
+              <div id="ev-result" style="padding:10px;border-radius:8px;text-align:center;background:var(--surface2)"><div style="font-size:10px;color:var(--text3)">EV</div><div style="font-size:18px;font-weight:700;color:var(--text2)">—</div></div>
+              <div id="edge-result" style="padding:10px;border-radius:8px;text-align:center;background:var(--surface2)"><div style="font-size:10px;color:var(--text3)">EDGE</div><div style="font-size:18px;font-weight:700;color:var(--text2)">—</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:16px">
+          <div class="settings-section-title" style="margin-bottom:12px">📋 Research Checklist</div>
+          <div style="display:grid;gap:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div><label>Recent Form (Team A)</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-form-a" placeholder="e.g. W W L W W"></div>
+              <div><label>Recent Form (Team B)</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-form-b" placeholder="e.g. L W W L W"></div>
+            </div>
+            <div><label>Head to Head</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-h2h" placeholder="e.g. Last 5: A won 3, B won 2"></div>
+            <div><label>Key Injuries / Lineup News</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-injuries" placeholder="e.g. Star player doubtful"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div><label>Rest / Schedule Spot</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-rest" placeholder="e.g. B on B2B"></div>
+              <div><label>Line Movement</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-line" placeholder="e.g. Opened -2, now -3.5"></div>
+            </div>
+            <div><label>Why I'm Taking This Bet</label><textarea style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit;resize:vertical;min-height:60px" id="r-why" placeholder="Your reasoning..."></textarea></div>
+          </div>
+        </div>
+        <div class="card" style="padding:16px">
+          <div class="settings-section-title" style="margin-bottom:12px">🧠 Gut Check</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div><label>Confidence (1-5)</label><select style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-confidence"><option value="">Select</option><option>⭐ 1 - Low</option><option>⭐⭐ 2 - Below avg</option><option>⭐⭐⭐ 3 - Average</option><option>⭐⭐⭐⭐ 4 - High</option><option>⭐⭐⭐⭐⭐ 5 - Very high</option></select></div>
+            <div><label>Bet Type</label><select style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-type"><option>Research-based</option><option>Instinct</option><option>Tipster</option><option>Value spot</option></select></div>
+            <div><label>Biggest Risk</label><input style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-risk" placeholder="e.g. Key player rested"></div>
+          </div>
+        </div>
+        <div class="card" id="r-reflection-section" style="padding:16px;display:none">
+          <div class="settings-section-title" style="margin-bottom:12px">📝 Post-Bet Reflection</div>
+          <div style="display:grid;gap:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div><label>Result</label><select style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-result"><option value="">Pending</option><option value="W">✅ Won</option><option value="L">❌ Lost</option><option value="P">↩️ Push</option></select></div>
+              <div><label>Research Quality (1-5)</label><select style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit" id="r-quality"><option value="">Rate your research</option><option value="1">1 - Was sloppy</option><option value="2">2 - Below avg</option><option value="3">3 - Decent</option><option value="4">4 - Thorough</option><option value="5">5 - Excellent</option></select></div>
+            </div>
+            <div><label>What I learned</label><textarea style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-family:inherit;resize:vertical;min-height:60px" id="r-learned" placeholder="Key takeaway..."></textarea></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn-secondary" onclick="closeResearchModal()">Cancel</button>
+          <button class="btn-primary" onclick="saveResearch()">💾 Save Research</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
 
 <script>
+
+// ── Robust date parser ──────────────────────────────────
+function parseDate(str) {
+  if (!str) return null;
+  str = String(str).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) return new Date(str);
+  const d = new Date(str);
+  if (!isNaN(d)) return d;
+  return null;
+}
+function toMonthKey(str) {
+  const d = parseDate(str);
+  if (!d || isNaN(d)) return str ? str.slice(0,7) : null;
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+function toDateKey(str) {
+  const d = parseDate(str);
+  if (!d || isNaN(d)) return null;
+  return d.toISOString().slice(0,10);
+}
+
 // ═══════════════════════════════════════════════════════
 // DB
 // ═══════════════════════════════════════════════════════
@@ -878,11 +983,27 @@ async function pullFromSupabase() {
 
 function showSetupBanner() {
   if (document.getElementById('sb-setup-banner')) return;
-  const sql = 'CREATE TABLE IF NOT EXISTS bets (id bigint PRIMARY KEY, date text, sport text, league text, bettype text, pick text, opponent text, wager numeric, odds numeric, result text, clv text, spread text, tipster text, notes text, units numeric);\nCREATE TABLE IF NOT EXISTS funds (id bigint PRIMARY KEY, date text, type text, amount numeric, notes text);\nCREATE TABLE IF NOT EXISTS settings (id int PRIMARY KEY DEFAULT 1, name text, \"unitSize\" numeric, \"startBankroll\" numeric, \"dailyStop\" numeric, \"weeklyStop\" numeric, \"monthlyStop\" numeric);\nALTER TABLE bets ENABLE ROW LEVEL SECURITY;\nALTER TABLE funds ENABLE ROW LEVEL SECURITY;\nALTER TABLE settings ENABLE ROW LEVEL SECURITY;\nCREATE POLICY \"anon_all\" ON bets FOR ALL USING (true) WITH CHECK (true);\nCREATE POLICY \"anon_all\" ON funds FOR ALL USING (true) WITH CHECK (true);\nCREATE POLICY \"anon_all\" ON settings FOR ALL USING (true) WITH CHECK (true);';
+  const sql = `CREATE TABLE IF NOT EXISTS bets (id bigint PRIMARY KEY, date text, sport text, league text, bettype text, pick text, opponent text, wager numeric, odds numeric, result text, clv text, spread text, tipster text, notes text, units numeric);
+CREATE TABLE IF NOT EXISTS funds (id bigint PRIMARY KEY, date text, type text, amount numeric, notes text);
+CREATE TABLE IF NOT EXISTS settings (id int PRIMARY KEY DEFAULT 1, name text, "unitSize" numeric, "startBankroll" numeric, "dailyStop" numeric, "weeklyStop" numeric, "monthlyStop" numeric);
+ALTER TABLE bets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE funds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon_all" ON bets FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "anon_all" ON funds FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "anon_all" ON settings FOR ALL USING (true) WITH CHECK (true);`;
   const banner = document.createElement('div');
   banner.id = 'sb-setup-banner';
   banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--surface2);border-bottom:2px solid var(--yellow);padding:16px 24px;';
-  banner.innerHTML = '<div style="max-width:700px;margin:0 auto"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span>⚙️</span><strong style="color:var(--yellow)">One-time Supabase Setup Required</strong><button onclick="document.getElementById('sb-setup-banner').remove()" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">✕ Dismiss</button></div><p style="font-size:12px;color:var(--text2);margin:0 0 10px">Run this SQL once in your <a href="https://supabase.com/dashboard/project/nafaxlihsiccdnchndvg/sql/new" target="_blank" style="color:var(--accent)">Supabase SQL Editor ↗</a>:</p><pre id="sb-sql-code" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;overflow-x:auto;white-space:pre">' + sql + '</pre><button onclick="navigator.clipboard.writeText(document.getElementById('sb-sql-code').textContent);this.textContent='✅ Copied!';setTimeout(()=>this.textContent='📋 Copy SQL',2000)" style="margin-top:8px;background:var(--accent);border:none;color:#000;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">📋 Copy SQL</button></div>';
+  banner.innerHTML = `<div style="max-width:700px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span>⚙️</span><strong style="color:var(--yellow)">One-time Supabase Setup Required</strong>
+      <button onclick="document.getElementById('sb-setup-banner').remove()" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px">✕ Dismiss</button>
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin:0 0 10px">Run this SQL once in your <a href="https://supabase.com/dashboard/project/nafaxlihsiccdnchndvg/sql/new" target="_blank" style="color:var(--accent)">Supabase SQL Editor ↗</a>:</p>
+    <pre id="sb-sql-code" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:11px;overflow-x:auto;white-space:pre">${sql}</pre>
+    <button onclick="navigator.clipboard.writeText(document.getElementById('sb-sql-code').textContent);this.textContent='✅ Copied!';setTimeout(()=>this.textContent='📋 Copy SQL',2000)" style="margin-top:8px;background:var(--accent);border:none;color:#000;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">📋 Copy SQL</button>
+  </div>`;
   document.body.prepend(banner);
 }
 
@@ -999,6 +1120,8 @@ function showPage(id) {
   if (id === 'analytics') buildAnalyticsGlossary();
   if (id === 'learn') buildLearnContent();
   if (id === 'report') renderReportCard();
+  if (id === 'edges') renderEdges();
+  if (id === 'research') renderResearchList();
   updatePendingBadge();
 }
 
@@ -1347,7 +1470,7 @@ function renderGrowth() {
   document.getElementById('gr-start').textContent = fmtINRFull(startBankroll);
   document.getElementById('gr-current').textContent = fmtINRFull(running);
   document.getElementById('gr-peak').textContent = fmtINRFull(peak);
-  document.getElementById('gr-payout').textContent = fmtINRFull(getUnitSize() * 21);
+  // gr-payout removed
 
   // Rolling ROI (20-bet window)
   const rollingROI = [];
@@ -2582,6 +2705,163 @@ const EXTRA_LEARN={
 <div class="info">Use Databallr's Last X Games to find players in high-usage situations due to teammate injuries — before the market prices it in.</div>
 </div></div>`}
 };
+
+
+// ═══════════════════════════════════════════════════════
+// MY EDGES
+// ═══════════════════════════════════════════════════════
+function renderEdges() {
+  const container = document.getElementById('edges-content');
+  const settled = DB.bets.filter(b => b.result === 'W' || b.result === 'L' || b.result === 'P');
+  if (!settled.length) { container.innerHTML = '<div class="card" style="padding:32px;text-align:center;color:var(--text3)">No settled bets yet — log some bets first!</div>'; return; }
+  function edgeStats(bets) {
+    const s = bets.filter(b => b.result !== 'P');
+    const wins = s.filter(b => b.result === 'W').length;
+    const pl = bets.reduce((a, b) => a + calcPL(b), 0);
+    const wager = bets.reduce((a, b) => a + b.wager, 0);
+    const roi = wager ? ((pl / wager) * 100) : 0;
+    const wr = s.length ? ((wins / s.length) * 100) : 0;
+    return { bets: bets.length, wins, wr, pl, roi };
+  }
+  function edgeCard(title, icon, rows) {
+    const sorted = [...rows].sort((a, b) => b.roi - a.roi).slice(0, 8);
+    const rows_html = sorted.map(r => {
+      const grade = r.roi > 30 ? '🔥' : r.roi > 15 ? '✅' : r.roi > 0 ? '➕' : '❌';
+      return `<tr><td style="font-weight:600">${r.label}</td><td style="color:var(--text3)">${r.bets}</td><td style="color:${r.wr>=55?'var(--accent)':r.wr>=45?'var(--text1)':'var(--red)'}">${r.wr.toFixed(0)}%</td><td class="${r.pl>=0?'pos':'neg'}">${r.pl>=0?'+':''}${fmtINR(r.pl)}</td><td style="color:${r.roi>=15?'var(--accent)':r.roi>=0?'var(--text1)':'var(--red)'}">${r.roi>=0?'+':''}${r.roi.toFixed(1)}%</td><td>${grade}</td></tr>`;
+    }).join('');
+    return `<div class="card fade-in"><div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:18px">${icon}</span><span style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">${title}</span></div><div class="table-wrap"><table><thead><tr><th>Category</th><th>Bets</th><th>Win%</th><th>P&L</th><th>ROI</th><th></th></tr></thead><tbody>${rows_html}</tbody></table></div></div>`;
+  }
+  const bySport={}, byType={}, byDay={}, byLeague={};
+  settled.forEach(b => {
+    const k1=b.sport||'Unknown'; if(!bySport[k1]) bySport[k1]=[]; bySport[k1].push(b);
+    const k2=b.bettype||'Unknown'; if(!byType[k2]) byType[k2]=[]; byType[k2].push(b);
+    const d=parseDate(b.date); if(d){const k3=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]; if(!byDay[k3]) byDay[k3]=[]; byDay[k3].push(b);}
+    const k4=b.league||'Unknown'; if(!byLeague[k4]) byLeague[k4]=[]; byLeague[k4].push(b);
+  });
+  const sportRows = Object.entries(bySport).map(([k,v])=>({label:`${sportEmoji(k)} ${k}`, ...edgeStats(v)}));
+  const typeRows = Object.entries(byType).map(([k,v])=>({label:k, ...edgeStats(v)}));
+  const dayRows = Object.entries(byDay).map(([k,v])=>({label:k, ...edgeStats(v)}));
+  const leagueRows = Object.entries(byLeague).filter(([,v])=>v.length>=3).map(([k,v])=>({label:k, ...edgeStats(v)}));
+  const ranges=[['<1.50',0,1.5],['1.50-1.80',1.5,1.8],['1.80-2.00',1.8,2.0],['2.00-2.50',2.0,2.5],['2.50+',2.5,99]];
+  const oddsRows = ranges.map(([label,lo,hi])=>{const bets=settled.filter(b=>b.odds>=lo&&b.odds<hi);return bets.length?{label,...edgeStats(bets)}:null;}).filter(Boolean);
+  const bestSport=[...sportRows].sort((a,b)=>b.roi-a.roi)[0];
+  const bestType=[...typeRows].sort((a,b)=>b.roi-a.roi)[0];
+  const bestOdds=[...oddsRows].sort((a,b)=>b.roi-a.roi)[0];
+  const bestDay=[...dayRows].sort((a,b)=>b.roi-a.roi)[0];
+  const insightHTML=`<div class="card fade-in" style="border:1px solid var(--accent);background:rgba(0,232,122,0.04)"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;color:var(--accent)">⚡ YOUR EDGE SUMMARY</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+    ${bestSport?`<div style="padding:12px;background:var(--surface2);border-radius:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">BEST SPORT</div><div style="font-weight:700;font-size:15px">${bestSport.label}</div><div style="color:var(--accent);font-size:12px">+${bestSport.roi.toFixed(1)}% ROI · ${bestSport.wr.toFixed(0)}% WR</div></div>`:''}
+    ${bestType?`<div style="padding:12px;background:var(--surface2);border-radius:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">BEST BET TYPE</div><div style="font-weight:700;font-size:15px">${bestType.label}</div><div style="color:var(--accent);font-size:12px">+${bestType.roi.toFixed(1)}% ROI · ${bestType.wr.toFixed(0)}% WR</div></div>`:''}
+    ${bestOdds?`<div style="padding:12px;background:var(--surface2);border-radius:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">BEST ODDS RANGE</div><div style="font-weight:700;font-size:15px">${bestOdds.label}</div><div style="color:var(--accent);font-size:12px">+${bestOdds.roi.toFixed(1)}% ROI · ${bestOdds.wr.toFixed(0)}% WR</div></div>`:''}
+    ${bestDay?`<div style="padding:12px;background:var(--surface2);border-radius:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">BEST DAY</div><div style="font-weight:700;font-size:15px">${bestDay.label}</div><div style="color:var(--accent);font-size:12px">+${bestDay.roi.toFixed(1)}% ROI · ${bestDay.wr.toFixed(0)}% WR</div></div>`:''}
+  </div></div>`;
+  container.innerHTML = insightHTML + edgeCard('By Sport','🏅',sportRows) + edgeCard('By Bet Type','🎯',typeRows) + edgeCard('By Odds Range','📊',oddsRows) + edgeCard('By Day of Week','📅',dayRows) + (leagueRows.length?edgeCard('By League','🏆',leagueRows):'');
+}
+
+// ═══════════════════════════════════════════════════════
+// PRE-GAME RESEARCH
+// ═══════════════════════════════════════════════════════
+function getResearchDB() { try { return JSON.parse(localStorage.getItem('abby_research')||'[]'); } catch(e) { return []; } }
+function saveResearchDB(data) { localStorage.setItem('abby_research', JSON.stringify(data)); }
+
+function newResearch() {
+  editingResearchId = null;
+  document.getElementById('research-modal-title').textContent = 'New Pre-Game Research';
+  ['r-teamA','r-teamB','r-sport','r-bettype','r-pick','r-odds','r-prob','r-form-a','r-form-b','r-h2h','r-injuries','r-rest','r-line','r-why','r-risk','r-learned'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('r-confidence').value='';
+  document.getElementById('r-type').value='Research-based';
+  document.getElementById('r-result').value='';
+  document.getElementById('r-quality').value='';
+  document.getElementById('r-reflection-section').style.display='none';
+  document.getElementById('ev-result').innerHTML='<div style="font-size:10px;color:var(--text3)">EV</div><div style="font-size:18px;font-weight:700;color:var(--text2)">—</div>';
+  document.getElementById('edge-result').innerHTML='<div style="font-size:10px;color:var(--text3)">EDGE</div><div style="font-size:18px;font-weight:700;color:var(--text2)">—</div>';
+  document.getElementById('research-modal').classList.add('open');
+}
+function closeResearchModal() { document.getElementById('research-modal').classList.remove('open'); editingResearchId=null; }
+function calcResearchEV() {
+  const prob=parseFloat(document.getElementById('r-prob').value)/100;
+  const odds=parseFloat(document.getElementById('r-odds').value);
+  if(!prob||!odds)return;
+  const ev=(prob*(odds-1))-(1-prob);
+  const edge=(prob-(1/odds))*100;
+  const evColor=ev>0?'var(--accent)':'var(--red)';
+  const edgeColor=edge>0?'var(--accent)':'var(--red)';
+  document.getElementById('ev-result').innerHTML=`<div style="font-size:10px;color:var(--text3)">EV</div><div style="font-size:18px;font-weight:700;color:${evColor}">${ev>0?'+':''}${(ev*100).toFixed(1)}%</div>`;
+  document.getElementById('edge-result').innerHTML=`<div style="font-size:10px;color:var(--text3)">EDGE</div><div style="font-size:18px;font-weight:700;color:${edgeColor}">${edge>0?'+':''}${edge.toFixed(1)}%</div>`;
+}
+function saveResearch() {
+  const data=getResearchDB();
+  const entry={
+    id:editingResearchId||Date.now(),
+    createdAt:editingResearchId?(data.find(r=>r.id===editingResearchId)||{}).createdAt||new Date().toISOString():new Date().toISOString(),
+    teamA:document.getElementById('r-teamA').value.trim(),
+    teamB:document.getElementById('r-teamB').value.trim(),
+    sport:document.getElementById('r-sport').value.trim(),
+    bettype:document.getElementById('r-bettype').value.trim(),
+    pick:document.getElementById('r-pick').value.trim(),
+    odds:document.getElementById('r-odds').value,
+    prob:document.getElementById('r-prob').value,
+    formA:document.getElementById('r-form-a').value.trim(),
+    formB:document.getElementById('r-form-b').value.trim(),
+    h2h:document.getElementById('r-h2h').value.trim(),
+    injuries:document.getElementById('r-injuries').value.trim(),
+    rest:document.getElementById('r-rest').value.trim(),
+    line:document.getElementById('r-line').value.trim(),
+    why:document.getElementById('r-why').value.trim(),
+    risk:document.getElementById('r-risk').value.trim(),
+    confidence:document.getElementById('r-confidence').value,
+    type:document.getElementById('r-type').value,
+    result:document.getElementById('r-result').value,
+    quality:document.getElementById('r-quality').value,
+    learned:document.getElementById('r-learned').value.trim(),
+  };
+  if(editingResearchId){const idx=data.findIndex(r=>r.id===editingResearchId);if(idx!==-1)data[idx]=entry;else data.unshift(entry);}
+  else data.unshift(entry);
+  saveResearchDB(data);
+  closeResearchModal();
+  renderResearchList();
+  showToast('success','Research saved!');
+}
+function editResearch(id) {
+  const data=getResearchDB(); const r=data.find(e=>e.id===id); if(!r)return;
+  editingResearchId=id;
+  document.getElementById('research-modal-title').textContent='Edit Research';
+  const fields={'r-teamA':r.teamA,'r-teamB':r.teamB,'r-sport':r.sport,'r-bettype':r.bettype,'r-pick':r.pick,'r-odds':r.odds,'r-prob':r.prob,'r-form-a':r.formA,'r-form-b':r.formB,'r-h2h':r.h2h,'r-injuries':r.injuries,'r-rest':r.rest,'r-line':r.line,'r-why':r.why,'r-risk':r.risk,'r-learned':r.learned};
+  Object.entries(fields).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val||'';});
+  document.getElementById('r-confidence').value=r.confidence||'';
+  document.getElementById('r-type').value=r.type||'Research-based';
+  document.getElementById('r-result').value=r.result||'';
+  document.getElementById('r-quality').value=r.quality||'';
+  document.getElementById('r-reflection-section').style.display='grid';
+  calcResearchEV();
+  document.getElementById('research-modal').classList.add('open');
+}
+function deleteResearch(id) {
+  if(!confirm('Delete this research?'))return;
+  saveResearchDB(getResearchDB().filter(r=>r.id!==id));
+  renderResearchList(); showToast('success','Deleted');
+}
+function renderResearchList() {
+  const container=document.getElementById('research-list');
+  const data=getResearchDB();
+  if(!data.length){container.innerHTML=`<div class="card" style="padding:40px;text-align:center"><div style="font-size:32px;margin-bottom:12px">🔬</div><div style="font-weight:700;margin-bottom:6px">No research yet</div><div style="color:var(--text3);font-size:13px">Click "+ New Research" before your next bet</div></div>`;return;}
+  container.innerHTML=data.map(r=>{
+    const resultBadge=r.result==='W'?'<span class="badge W">WIN</span>':r.result==='L'?'<span class="badge L">LOSS</span>':r.result==='P'?'<span class="badge P">PUSH</span>':'<span class="badge pending">PENDING</span>';
+    const conf=r.confidence?r.confidence.split(' ')[0]:'—';
+    const date=new Date(r.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    return `<div class="card" style="padding:16px"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">${resultBadge}<span style="font-weight:700;font-size:15px">${r.pick||r.teamA+' vs '+r.teamB}</span>${r.sport?`<span class="tag">${sportEmoji(r.sport)} ${r.sport}</span>`:''}</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text3);margin-bottom:8px">${r.odds?`<span>Odds: <strong style="color:var(--text1)">${r.odds}</strong></span>`:''} ${r.confidence?`<span>Confidence: <strong>${conf}</strong></span>`:''} ${r.type?`<span>Type: <strong>${r.type}</strong></span>`:''}<span style="margin-left:auto">${date}</span></div>
+        ${r.why?`<div style="font-size:12px;color:var(--text2);padding:8px;background:var(--surface2);border-radius:6px;border-left:2px solid var(--accent)">"${r.why}"</div>`:''}
+        ${r.learned?`<div style="font-size:12px;color:var(--yellow);margin-top:6px;padding:8px;background:rgba(255,201,64,0.06);border-radius:6px;border-left:2px solid var(--yellow)">💡 ${r.learned}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button onclick="editResearch(${r.id})" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px">✏️ Edit</button>
+        <button onclick="deleteResearch(${r.id})" style="background:none;border:1px solid var(--border);color:var(--red);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px">🗑</button>
+      </div>
+    </div></div>`;
+  }).join('');
+}
 
 // ═══════════════════════════════════════════════════════
 // INIT
